@@ -114,20 +114,20 @@ fi
 
 for disk in ${disks[@]}
 do
-    ls /dev/${disk} > /dev/null 2>&1
-    if [ $? -ne 0 ]
-    then
+    if [ ! -b /dev/${disk} ]; then
         echo "${disk} does not exist, please check name"
         continue
     fi
 
     nvme_has_mnt_pnt ${disk}
-    if [ $? -ne 0 ]
-    then
+    if [ $? -ne 0 ]; then
         echo "${disk} is mounted or contains file system, skipping it for test"
         continue
     fi
     test_disks=(${test_disks[@]} ${disk})
+    ${my_dir}/tools/hotplug ${disk} > ${drvinfo_dir}/${disk}_hotplug.log
+    ${my_dir}/tools/irqlist ${disk} > ${drvinfo_dir}/${disk}_irqlist.log
+    collect_drv_info ${disk}        > ${drvinfo_dir}/${disk}_1.info
 done
 
 disks=(${test_disks[@]})
@@ -145,7 +145,7 @@ then
     spdk_disks=""
     for disk in ${disks[@]}
     do
-        export spdk_while_list="${spdk_while_list} $(nvme2busid_full ${disk})"
+        export spdk_while_list="${spdk_while_list} $(nvme2busid ${disk})"
         spdk_disks=(${spdk_disks[@]} $(nvme2busid_spdk ${disk}))
     done
     
@@ -222,6 +222,11 @@ do
 done
 
 reset_spdk "${spdk_dir}" "${spdk_while_list}"
+
+for disk in ${disks[@]}
+do
+    collect_drv_info ${disk} > ${drvinfo_dir}/${disk}_2.info
+done
 
 for disk in ${disks[@]}
 do

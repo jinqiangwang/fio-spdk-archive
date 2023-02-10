@@ -223,7 +223,8 @@ done
 
 reset_spdk "${spdk_dir}" "${spdk_while_list}"
 
-for disk in ${disks[@]}
+# test_disks are nvme drive while disk can be BDFs
+for disk in ${test_disks[@]}
 do
     collect_drv_info ${disk} > ${drvinfo_dir}/${disk}_2.info
 done

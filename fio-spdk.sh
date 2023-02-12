@@ -194,6 +194,10 @@ do
             cpu_bind_opt="${cpu_bind}${bind_list[$i]}"
         fi
 
+        if [ -f ${result_dir}/${disk}_${workload_name}.fio ]; then 
+            workload_name="${workload_name}_`date +%Y%m%d_%H%M%S`"
+        fi
+
         if [ "${type}" != "spdk" ]; then
             iostat -dxmct 1 ${disk} > ${iostat_dir}/${disk}_${workload_name}.iostat &
             export iostat_pid_list="${iostat_pid_list} $!"
@@ -228,6 +232,10 @@ for disk in ${test_disks[@]}
 do
     collect_drv_info ${disk} > ${drvinfo_dir}/${disk}_2.info
 done
+
+if [ "${type}" == "nvme" ]; then
+    iostat_to_csv ${iostat_dir}
+fi
 
 for disk in ${disks[@]}
 do

@@ -19,17 +19,17 @@
 
 - 注意事项
 - 获取工具与帮助
-- 选择测试设备（参数：-d，必选参数）
-- 选择配置文件 （参数：-j，可选参数。不指定时使用配置文件job_cfg_common）
-- 绑核、绑numa（参数：-c / -n，可选参数。不指定时不绑核/NUMA）
-- nvme、spdk模式（参数：-t，可选参数，不指定时使用nvme方式）
+- 选择测试设备（参数：-d）
+- 选择配置文件 （参数：-j）
+- 绑核、绑numa（参数：-c / -n）
+- nvme、spdk模式（参数：-t）
 - 日志输出
 - **执行示例**
 
 
 ## 注意事项
 
-> spdk模式在CentOS 8.5/7.6以下的版本上由于内核驱动（vfio-pci）的原因无法运行，请升级到CentOS 8.5/7.6或单独升级内核到5.10之后的版本。
+> 使用spdk模式测试时请使用Centos8.5或更换内核版本到4.18.0-348.7.1.el8_5.x86_64（CentOS Linux release 8.5.2111）或更新
 
 
 
@@ -87,10 +87,10 @@ export ramp_time_randwrite=1800     #随机写预处理时长
 export runtime=1200                 #测试时长
 
 # 读写模式    块大小   队列数量    队列深度
-# seqread|  4k   |    1    |  64
+# seqread  |  4k   |    1    |  64
 
 export workloads=( \
-###  注意：请不要在下面每行双引号中加任何空格
+###  rw|bs|jobs|iodepth # DO NOT add any space in strings below
     "precond_seq|128k|1|128" \
     "seqread|4k|1|64" \
     "seqwrite|4k|1|128" \
@@ -108,7 +108,7 @@ export workloads=( \
 
 ## 绑核、绑numa（参数：-c / -n）
 
-使用 `-c` 或 `-n` 参数即可绑定相应的cpu核或者numa，通常建议绑定本地核或者numa。如果同时指定了-c和-n，只有-n生效
+使用 `-c` 或 `-n` 参数即可绑定相应的cpu核或者numa，通常建议绑定本地核或者numa
 
 ```shell
 #绑核单盘
@@ -233,4 +233,3 @@ NUMA node1 CPU(s):     28-55,84-111
 #绑numa测试
 ./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 ...." [-t spdk] -c "0 0 1 1....." -j test_cfg
 ```
-

@@ -218,7 +218,7 @@ NUMA node1 CPU(s):     28-55,84-111
 ./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 nvme3n1...." [-t spdk] -c "0-3 4-7 8-11 12-15....."
 
 #绑numa测试
-./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 ...." [-t spdk] -c "0 0 1 1....."
+./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 ...." [-t spdk] -n "0 0 1 1....."
 ```
 
 自定义模型测试
@@ -231,5 +231,5 @@ NUMA node1 CPU(s):     28-55,84-111
 ./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 nvme3n1...." [-t spdk] -c "0-3 4-7 8-11 12-15....." -j test_cfg
 
 #绑numa测试
-./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 ...." [-t spdk] -c "0 0 1 1....." -j test_cfg
+./fio-spdk -d "nvme0n1 nvme1n1 nvme2n1 ...." [-t spdk] -n "0 0 1 1....." -j test_cfg
 ```

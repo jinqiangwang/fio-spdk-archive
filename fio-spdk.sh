@@ -79,13 +79,13 @@ source ${my_dir}/${jobcfg}
 centos_ver=$(get_centos_version)
 if [[ "${centos_ver}" != "7" ]] && [[ "${centos_ver}" != "8" ]]
 then
-    echo "unsupported operating system, please use either centos7 or centos8"
-    exit 3;
+    echo "warning: unsupported operating system, please use centos7 or centos8"
+    # exit 3;
 fi
 
 spdk_dir="${my_dir}/centos${centos_ver}/spdk"
 fio_dir="${my_dir}/centos${centos_ver}/fio"
-fio_cmd="${fio_dir}/fio"
+fio_cmd=${fio_cmd-"${fio_dir}/fio"}
 ld_preload=""
 filename_format="/dev/%s"
 nvme_dev_info=$(${my_dir}/tools/nvme_dev.sh)

@@ -151,7 +151,7 @@ function fio_to_csv() {
         fi
         
         grep -e rw= ${f} | sed -r -e "s/(.*):\s\(.*/\1/g" >> ${job_name}
-        if [ ! -z "`grep rw=randrw ${f}`" ]; then echo >> ${job_name}; fi
+        if [ ! -z "`grep rw=randrw ${f}`" ] || [ ! -z "`grep rw=rw ${f}`" ]; then echo >> ${job_name}; fi
         grep -e rw= ${f} | sed -r -e "s/.*rw=(randrw),.*/\1\n/g" -e "s/.*rw=([a-z]+),.*/\1/g" >> ${io_pattern}
         grep -e BW= ${f} | sed -r -e "s/\s*(.*):\s*IOPS=([0-9\.k]+),\s*BW=([0-9\.]+MiB).*\(([0-9\.kK]+MB).*/\1,\2,\3,\4/g" \
              -e "s/\s*(.*):\s*IOPS=([0-9\.]+),\s*BW=([0-9\.]+KiB).*\(([0-9\.kK]+KB).*/\1,\2,\3,\4/g" \

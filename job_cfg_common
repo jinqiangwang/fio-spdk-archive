@@ -8,8 +8,8 @@ export runtime=1200
 export workloads=( \
 ###  rw|bs|jobs|iodepth # DO NOT add any space in strings below
     "precond_seq|128k|1|128" \
-    "seqread|4k|1|64" \
-    "seqwrite|4k|1|128" \
+    "seqread|128k|1|64" \
+    "seqwrite|128k|1|128" \
     "randread|4k|8|256" \
     "randwrite|4k|8|32" \
     "randrw55|4k|8|32" \

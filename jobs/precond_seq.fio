@@ -14,8 +14,4 @@ numjobs=${numjobs}
 iodepth=${iodepth}
 fill_device=1
 loops=2
-log_avg_msec=1000
-per_job_logs=0
-write_bw_log=${output_name}
-write_iops_log=${output_name}
-write_lat_log=${output_name}
+${fio_log_cfg}

@@ -6,7 +6,8 @@ usage="invalid parameters provided.\
 \t -d: drive list. mandatory option\n\
 \t -c: cpu core bind list. bind list is corresponding to drive list. optional\n\
 \t -n: numa node bind list. -n takes precendence when both -c and -n are used. optional\n\
-\t -j: job config file. default config file is \"job_cfg_common\". optional"
+\t -j: job config file. default config file is \"job_cfg_common\". optional\n\"
+\t -l: record fio IOPS/BW logs. enabling this may cause IOPS/BW dropping on slow CPUs"
 
 export my_dir="$( cd "$( dirname "$0"  )" && pwd  )"
 timestamp=`date +%Y%m%d_%H%M%S`
@@ -18,8 +19,9 @@ disks=""
 numa_list=""    # numa list to bind; if both -n & -c are used, numa list takes precendence
 core_list=""    # cpu core list to bind
 jobcfg=job_cfg_common
+fio_log_cfg="description= "  # by default do not record fio IOPS/BW logs
 
-while getopts "d:c:j:n:t:" opt
+while getopts "d:c:j:n:t:l" opt
 do
     case $opt in 
     t)
@@ -36,6 +38,9 @@ do
         ;;
     j)
         jobcfg="$OPTARG"
+        ;;
+    l)
+        unset fio_log_cfg
         ;;
     *)
         echo -e ${usage}

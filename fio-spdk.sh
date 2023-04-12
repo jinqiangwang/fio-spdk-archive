@@ -19,7 +19,7 @@ disks=""
 numa_list=""    # numa list to bind; if both -n & -c are used, numa list takes precendence
 core_list=""    # cpu core list to bind
 jobcfg=job_cfg_common
-fio_log_cfg="description= "  # by default do not record fio IOPS/BW logs
+record_fio_log=0 # by default do not record fio IOPS/BW logs
 
 while getopts "d:c:j:n:t:l" opt
 do
@@ -40,7 +40,7 @@ do
         jobcfg="$OPTARG"
         ;;
     l)
-        unset fio_log_cfg
+        record_fio_log=1
         ;;
     *)
         echo -e ${usage}
@@ -99,11 +99,13 @@ if [ ! -d "${output_dir}" ]; then mkdir -p ${output_dir}; fi
 iostat_dir=${output_dir}/iostat
 result_dir=${output_dir}/result
 drvinfo_dir=${output_dir}/drvinfo
-iolog_dir=${output_dir}/io_logs
 mkdir -p ${iostat_dir}
 mkdir -p ${result_dir}
 mkdir -p ${drvinfo_dir}
-mkdir -p ${iolog_dir}
+if [ ${record_fio_log} -ne 0 ]; then
+    iolog_dir=${output_dir}/io_logs
+    mkdir -p ${iolog_dir}
+fi
 
 echo -e "$0 $@\n"        > ${output_dir}/sysinfo.log
 echo "${nvme_dev_info}" >> ${output_dir}/sysinfo.log
@@ -210,6 +212,15 @@ do
 
         export output_name=${iolog_dir}/${disk}_${workload_name}
         
+        fio_log_opt=""
+        if [ ${record_fio_log} -ne 0 ]; then
+            fio_log_opt="--log_avg_msec=1000 \
+                         --per_job_logs=0 \
+                         --write_bw_log=$output_name} 
+                         --write_iops_log=${output_name} \
+                         --write_lat_log=${output_name}"
+        fi
+
         # echo ${filename_format} ${disk}
         # echo $(printf "${filename_format}\n" ${disk})
 
@@ -217,6 +228,7 @@ do
         bs=$bs numjobs=$numjobs iodepth=$iodepth \
         ${fio_cmd} --filename="$(printf "${filename_format}" ${disk})" \
             ${cpu_bind_opt} \
+            ${fio_log_opt} \
             --output=${result_dir}/${disk}_${workload_name}.fio \
             ${my_dir}/jobs/${workload_file}.fio &
         fio_pid_list="${fio_pid_list} $!"

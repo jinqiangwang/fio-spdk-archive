@@ -14,4 +14,3 @@ numjobs=${numjobs}
 iodepth=${iodepth}
 fill_device=1
 loops=2
-${fio_log_cfg}

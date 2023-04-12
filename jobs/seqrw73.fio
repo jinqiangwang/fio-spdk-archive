@@ -16,4 +16,3 @@ runtime=${runtime}
 ramp_time=${ramp_time}
 size=100%
 time_based
-${fio_log_cfg}

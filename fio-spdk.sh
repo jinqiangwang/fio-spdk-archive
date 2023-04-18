@@ -80,6 +80,7 @@ fi
 source ${my_dir}/helper/functions
 source ${my_dir}/helper/func_spdk
 source ${my_dir}/${jobcfg}
+source ${my_dir}/jobs/common.fio
 
 centos_ver=$(get_centos_version)
 if [[ "${centos_ver}" != "7" ]] && [[ "${centos_ver}" != "8" ]]
@@ -229,6 +230,7 @@ do
         ${fio_cmd} --filename="$(printf "${filename_format}" ${disk})" \
             ${cpu_bind_opt} \
             ${fio_log_opt} \
+            ${random_map_opts} \
             --output=${result_dir}/${disk}_${workload_name}.fio \
             ${my_dir}/jobs/${workload_file}.fio &
         fio_pid_list="${fio_pid_list} $!"

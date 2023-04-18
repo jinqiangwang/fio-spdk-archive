@@ -193,7 +193,8 @@ function fio_to_csv() {
                    -e "s/.*rw=(rw),.*/\1\n/g" \
                    -e "s/.*rw=([a-z]+),.*/\1/g" \
                    >> ${io_pattern}
-        grep -e BW= ${f} | sed -r -e "s/\s*(.*):\s*IOPS=([0-9\.k]+),\s*BW=([0-9\.]+MiB).*\(([0-9\.kK]+MB).*/\1,\2,\3,\4/g" \
+        grep -e BW= ${f} | sed -r -e "s/\s*(.*):\s*IOPS=([0-9\.k]+),\s*BW=([0-9\.]+GiB).*\(([0-9\.kK]+GB).*/\1,\2,\3,\4/g" \
+             -e "s/\s*(.*):\s*IOPS=([0-9\.k]+),\s*BW=([0-9\.]+MiB).*\(([0-9\.kK]+MB).*/\1,\2,\3,\4/g" \
              -e "s/\s*(.*):\s*IOPS=([0-9\.]+),\s*BW=([0-9\.]+KiB).*\(([0-9\.kK]+KB).*/\1,\2,\3,\4/g" \
              >> ${bw_iops_csv}
         grep -e "\slat\s.*avg=" ${f} | sed -r -e "s/^\s+lat\s*\(([a-z]+)\)\s*:\s*min=\s*([0-9]+),\s+max=\s*([0-9\.kK]+),\s+avg=\s*([0-9\.]+),\sstdev=\s*([0-9\.]+).*/\1,\2,\3,\4,\5/g" \

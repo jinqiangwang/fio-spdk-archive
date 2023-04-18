@@ -201,6 +201,11 @@ do
     iodepth=${workload_desc[4]}         # iodepth
     echo "${workload_desc} ${workload_name}-${bs}+j${numjobs}+qd${iodepth}"
 
+    if [ "${type}" != "spdk" ]; then
+        iostat -dxmct 1 ${disks[@]} > ${iostat_dir}/${workload_name}.iostat &
+        export iostat_pid=$!
+    fi
+
     for disk in ${disks[@]}; do
         cpu_bind_opt=""
         if [ ! -z "${cpu_bind}" ]; then
@@ -209,11 +214,6 @@ do
 
         if [ -f ${result_dir}/${disk}_${workload_name}.fio ]; then 
             workload_name="${workload_name}_`date +%Y%m%d_%H%M%S`"
-        fi
-
-        if [ "${type}" != "spdk" ]; then
-            iostat -dxmct 1 ${disk} > ${iostat_dir}/${disk}_${workload_name}.iostat &
-            export iostat_pid_list="${iostat_pid_list} $!"
         fi
 
         export output_name=${iolog_dir}/${disk}_${workload_name}
@@ -251,8 +251,8 @@ do
     done
 
     wait ${fio_pid_list}
-    if [ ! -z "${iostat_pid_list}" ]; then
-        kill -9 ${iostat_pid_list}
+    if [ ! -z "${iostat_pid}" ]; then
+        kill -9 ${iostat_pid}
     fi
     sync
 done
@@ -266,7 +266,9 @@ do
 done
 
 if [ "${type}" == "nvme" ]; then
-    iostat_to_csv ${iostat_dir}
+    for disk in ${disks[@]}; do
+        iostat_to_csv_1 ${iostat_dir} ${disk}
+    done
 fi
 
 for disk in ${disks[@]}

@@ -5,9 +5,9 @@ function trap_ctrlc() {
     kill -9 ${fio_pid_list}
     echo "kill fio [${fio_pid_list}] =$? (0 = success)"
 
-    if [ ! -z "${iostat_pid_list}" ]; then
-        kill -9 ${iostat_pid_list}
-        echo "kill iostat [${iostat_pid_list}] =$? (0 = success)"
+    if [ ! -z "${iostat_pid}" ]; then
+        kill -9 ${iostat_pid}
+        echo "kill iostat [${iostat_pid}] =$? (0 = success)"
     fi
 
     # spdk_dir is defined in fio-spdk.sh
@@ -116,6 +116,42 @@ function iostat_to_csv() {
 
         grep -m1 Device ${fiostat} | sed -r "s/\s+/,/g" | cut -d, -f ${iofields} > ${io_out}
         grep -e nvme -e sd -e vd ${fiostat} | sed -r "s/\s+/,/g"  | cut -d, -f ${iofields} >> ${io_out}
+
+        grep -m1 avg-cpu ${fiostat} | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} > ${cpu_out}
+        grep -A1 avg-cpu ${fiostat} | grep -v \- | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} >> ${cpu_out}
+        
+        paste -d, ${ts} ${io_out} ${cpu_out} > ${data_dir}/${barename}.csv
+        rm -f ${ts} ${io_out} ${cpu_out}
+    done
+}
+
+function iostat_to_csv_1() {
+    data_dir=$1
+    dev_name=$2 # nvme0n1 or nvme1n1
+    if [[ ! -d ${data_dir} ]]; then return 1; fi
+
+    iostat_ver=`iostat -V | grep -m1 -i sysstat | cut -d" " -f3 | cut -d\. -f1`
+    if [[ ${iostat_ver} -lt 11 ]]
+    then
+        iofields="4-9,14"
+        cpufields="1-2,4"
+    else
+        iofields="2-5,12-14,16"
+        cpufields="1-2,4"
+    fi
+
+    for fiostat in `ls ${data_dir}/*.iostat`
+    do
+        barename=${fiostat/*\/}; barename=${barename/.iostat}
+        ts=${data_dir}/${barename}.ts
+        io_out=${data_dir}/${barename}.io
+        cpu_out=${data_dir}/${barename}.cpu
+
+        echo "timestamp" > ${ts}
+        grep -E "[0-9]+:[0-9]+:" ${fiostat} >> ${ts}
+
+        grep -m1 Device ${fiostat} | sed -r "s/\s+/,/g" | cut -d, -f ${iofields} > ${io_out}
+        grep -e ${dev_name} ${fiostat} | sed -r "s/\s+/,/g"  | cut -d, -f ${iofields} >> ${io_out}
 
         grep -m1 avg-cpu ${fiostat} | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} > ${cpu_out}
         grep -A1 avg-cpu ${fiostat} | grep -v \- | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} >> ${cpu_out}

@@ -227,17 +227,25 @@ do
                          --write_lat_log=${output_name}"
         fi
 
-        # echo ${filename_format} ${disk}
-        # echo $(printf "${filename_format}\n" ${disk})
-
-        LD_PRELOAD=${ld_preload} \
-        bs=$bs numjobs=$numjobs iodepth=$iodepth \
-        ${fio_cmd} --filename="$(printf "${filename_format}" ${disk})" \
+        command_line="LD_PRELOAD=${ld_preload} \
+            bs=${bs} numjobs=${numjobs} iodepth=${iodepth} \
+            ${fio_cmd} --filename=\"$(printf \"${filename_format}\" ${disk})\" \
             ${cpu_bind_opt} \
             ${fio_log_opt} \
             ${random_map_opts} \
             --output=${result_dir}/${disk}_${workload_name}.fio \
-            ${my_dir}/jobs/${workload_file}.fio &
+            ${my_dir}/jobs/${workload_file}.fio &"
+
+        echo ${command_line} >> ${output_dir}/${disk}_cmdline.log
+
+        LD_PRELOAD=${ld_preload} \
+        bs=${bs} numjobs=${numjobs} iodepth=${iodepth} \
+        ${fio_cmd} --filename="$(printf "${filename_format}" ${disk})" \
+        ${cpu_bind_opt} \
+        ${fio_log_opt} \
+        ${random_map_opts} \
+        --output=${result_dir}/${disk}_${workload_name}.fio \
+        ${my_dir}/jobs/${workload_file}.fio &
         fio_pid_list="${fio_pid_list} $!"
         i=$(($i+1))
     done

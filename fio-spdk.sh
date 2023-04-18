@@ -85,8 +85,13 @@ source ${my_dir}/jobs/common.fio
 centos_ver=$(get_centos_version)
 if [[ "${centos_ver}" != "7" ]] && [[ "${centos_ver}" != "8" ]]
 then
-    echo "warning: unsupported operating system, please use centos7 or centos8"
-    # exit 3;
+    echo "warning: unsupported operating system, please use centos7 or centos8. "
+    if [ -z "${fio_cmd}" ]; then
+        echo "you may append fio_cmd=fio before $0 to force it ro run."
+        echo "example:"
+        echo "    fio_cmd=/usr/bin/fio ./fio-spdk.sh -d nvme2n1"
+        exit 3;
+    fi
 fi
 
 spdk_dir="${my_dir}/centos${centos_ver}/spdk"

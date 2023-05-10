@@ -143,9 +143,10 @@ function iostat_to_csv_1() {
     for fiostat in `ls ${data_dir}/*.iostat`
     do
         barename=${fiostat/*\/}; barename=${barename/.iostat}
-        ts=${data_dir}/${barename}.ts
-        io_out=${data_dir}/${barename}.io
-        cpu_out=${data_dir}/${barename}.cpu
+        ts=${data_dir}/${dev_name}_${barename}.ts
+        io_out=${data_dir}/${dev_name}_${barename}.io
+        cpu_out=${data_dir}/${dev_name}_${barename}.cpu
+        csv_file=${data_dir}/${dev_name}_${barename}.csv
 
         echo "timestamp" > ${ts}
         grep -E "[0-9]+:[0-9]+:" ${fiostat} >> ${ts}
@@ -156,7 +157,7 @@ function iostat_to_csv_1() {
         grep -m1 avg-cpu ${fiostat} | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} > ${cpu_out}
         grep -A1 avg-cpu ${fiostat} | grep -v \- | sed -r "s/\s+/,/g" | cut -d, -f ${cpufields} >> ${cpu_out}
         
-        paste -d, ${ts} ${io_out} ${cpu_out} > ${data_dir}/${barename}.csv
+        paste -d, ${ts} ${io_out} ${cpu_out} > ${csv_file}
         rm -f ${ts} ${io_out} ${cpu_out}
     done
 }

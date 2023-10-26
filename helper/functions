@@ -168,7 +168,7 @@ function fio_to_csv() {
     if [[ ! -d ${data_dir} ]]; then return 1; fi
 
     header=0
-    for f in `ls -tr ${data_dir}/${disk}* | grep -e .fio -e .log`
+    for f in `ls -tr ${data_dir}/${disk}_* | grep -e .fio -e .log`
     do
         disk_name=${f/*\/}; disk_name=${disk_name/[-_]*}
         job_name=${data_dir}/${disk_name}_job_name.csv
